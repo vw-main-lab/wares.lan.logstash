@@ -1,0 +1,17 @@
+{% if ansible_facts['os_family'] == 'Debian' %}
+Debian
+{% elif ansible_facts['os_family'] == 'RedHat' %}
+Redhat
+{% else %}
+Not Debian
+{% endif %}
+
+{{ role_sample_example_dict.name }} : {{ role_sample_example_dict.description }}
+
+{% for example_item in role_sample_example_list %}
+[{{ example_item.name }}]
+   name = {{ example_item.name }}
+   rank = {{ example_item.rank }}
+   description = {{ example_item.description }}
+
+{% endfor %}

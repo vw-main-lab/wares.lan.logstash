@@ -1,0 +1,5 @@
+# - name: general.some.role
+#   src: "git+git@github.com:vw-ansible-roles/general.some.role.git"
+#   src: "git+https://github.com/vw-ansible-roles/general.some-other.role"
+#   src: git+file:///media/psf/Home/Documents/Projets/Lab/yet.another.role
+#   version: "1.0"

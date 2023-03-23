@@ -1,0 +1,11 @@
+---
+- name: Template logstash service file
+  ansible.builtin.template:
+    src: logstash.service
+    dest: "/etc/systemd/system/{{ wares_lan_logstash_service.filename }}"
+    owner: "{{ wares_lan_logstash_service.user }}"
+    group: "{{ wares_lan_logstash_service.group }}"
+    mode: '0600'
+  notify:
+  - Enable logstash service and ensure it is not masked
+  - Restart logstash service

@@ -1,0 +1,31 @@
+---
+# vars file for role-sample
+
+wares_lan_logstash:
+  binary_dir: "/usr/local/bin/logstash"
+  config_dir: "/usr/local/bin/logstash/config"
+  user: "logstash"
+  group: "users"
+  config_filename: "logstash-conf.yml"
+  run_as_service: true
+  inputs:
+    beats:
+      - {id: 'standard-port', enabled: true, port: 5044}
+      - {id: 'custom-port', enabled: false, port: 5045}
+  outputs: # Configure what output to use when sending formatted data
+    elasticsearch:
+      enabled: true
+      hosts: ["localhost:9200"]
+      index: "%{[@metadata][beat]}-%{[@metadata][version]}-%{+YYYY.MM.dd}"
+      ssl_enabled: False # either True ou False
+      ssl_certificate_verification: False # either True ou False
+      cacert: "/usr/share/ca-certificates/my.pem" # path to certificate; leave blank ("") to disable
+      auth: # Authentication credentials - either API key or username/password; leave api_key and username blank ("") to disable authentication
+        api_key: "" # format: "id:api-key", e.g "TiNAGG4BaaMdaH1tRfuU:KnR6yE41RrSowb0kQ0HWoA"
+        username: ""
+        password: ""
+    kafka:
+      enabled: false
+      hosts: 
+        - {id: 'dev', hostname: 'localhost', enabled: true, port: 9092}
+        - {id: 'prod', hostname: 'kafka.domain.com', enabled: false, port: 9092}
