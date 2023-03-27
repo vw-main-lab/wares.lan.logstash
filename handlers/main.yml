@@ -1,2 +1,12 @@
 ---
-# handlers file for role-sample
+- name: Enable logstash service and ensure it is not masked
+  ansible.builtin.systemd:
+    name: "{{ wares_lan_logstash_service.filename }}"
+    enabled: true
+    daemon_reload: true
+    masked: no
+
+- name: Restart logstash service
+  ansible.builtin.service:
+    name: "{{ wares_lan_logstash_service.filename }}"
+    state: restarted

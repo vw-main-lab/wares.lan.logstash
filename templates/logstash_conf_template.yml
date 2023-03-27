@@ -5,7 +5,7 @@ input {
 {% for wares_lan_logstash_beats in wares_lan_logstash.inputs.beats if wares_lan_logstash_beats.enabled %}
   beats {
     id => "{{ wares_lan_logstash_beats.id }}"
-    port => "{{ wares_lan_logstash_beats.port }}"
+    port => {{ wares_lan_logstash_beats.port }}
   }
 {% endfor %}
 }
@@ -13,7 +13,7 @@ input {
 output {
 {% if wares_lan_logstash.outputs.elasticsearch.enabled == true %}
   elasticsearch {
-    hosts => [{% for wares_lan_logstash_elasticsearch_host in wares_lan_logstash.outputs.elasticsearch.hosts %}{% if not loop.first %}, {% endif %}"{{ wares_lan_logstash_elasticsearch_host }}"{% endfor %}]
+    hosts => [{% for wares_lan_logstash_elasticsearch_host in wares_lan_logstash.outputs.elasticsearch.hosts if wares_lan_logstash_elasticsearch_host.enabled %}{% if not loop.first %}, {% endif %}"{{ wares_lan_logstash_elasticsearch_host.url }}:{{ wares_lan_logstash_elasticsearch_host.port }}"{% endfor %}]
     index => "{{ wares_lan_logstash.outputs.elasticsearch.index }}"
     ilm_enabled => {{ wares_lan_logstash.outputs.elasticsearch.ilm_enabled |lower }}
     ssl => {{ wares_lan_logstash.outputs.elasticsearch.ssl_enabled |lower }} 
@@ -27,6 +27,14 @@ output {
     user => "{{ wares_lan_logstash.outputs.elasticsearch.auth.username }}"
     password => "{{ wares_lan_logstash.outputs.elasticsearch.auth.password }}"
 {% endif %}
+  }
+{% endif %}
+{% if wares_lan_logstash.outputs.kafka.enabled == true %}
+  kafka {
+    bootstrap_servers => [{% for wares_lan_logstash_kafka_host in wares_lan_logstash.outputs.kafka.hosts if wares_lan_logstash_kafka_host.enabled %}{% if not loop.first %}, {% endif %}"{{ wares_lan_logstash_kafka_host.servername }}:{{ wares_lan_logstash_kafka_host.port }}"{% endfor %}]
+    codec => "{{ wares_lan_logstash.outputs.kafka.codec }}"
+    topic_id => "{{ wares_lan_logstash.outputs.kafka.topic_id }}"
+    id => "{{ wares_lan_logstash.outputs.kafka.id }}"
   }
 {% endif %}
 }

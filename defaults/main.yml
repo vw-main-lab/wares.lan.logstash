@@ -14,7 +14,7 @@ wares_lan_logstash_service:
   after: ["network.target"]
   type: "simple"
   killmode: "process"
-  execstart: "{{ wares_lan_logstash.binary_dir }}/logstash -f {{ wares_lan_logstash.config_dir }}/{{ wares_lan_logstash.config_filename }}"
+  execstart: "{{ wares_lan_logstash.binary_dir }}/bin/logstash -f {{ wares_lan_logstash.config_dir }}/{{ wares_lan_logstash.config_filename }}"
   wantedby: "multi-user.target"
   user: "{{ wares_lan_logstash.user }}"
   group: "{{ wares_lan_logstash.group }}"

@@ -1,0 +1,13 @@
+[Unit]
+Description={{ wares_lan_logstash_service.description }}
+After={{ wares_lan_logstash_service.after }}
+
+[Service]
+ExecStart={{ wares_lan_logstash_service.execstart }}
+KillMode={{ wares_lan_logstash_service.killmode }}
+Type={{ wares_lan_logstash_service.type }}
+User={{ wares_lan_logstash_service.user }}
+Group={{ wares_lan_logstash_service.group }}
+
+[Install]
+WantedBy={{ wares_lan_logstash_service.wantedby }}
