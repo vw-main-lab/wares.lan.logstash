@@ -6,7 +6,7 @@ wares_lan_logstash_source:
   extracted_dirname: "logstash-7.17.0"
   download_url: "https://artifacts.elastic.co/downloads/logstash/logstash-7.17.0-linux-x86_64.tar.gz"
   checksum: "sha512:7950a115416bf4ad8b7a78aa6609299e0cc44f0053f61c8de1253335168c26a92d6013e415c58dcced3e4c535d4006a37b95e943de038a4cedfe20c90a4c7947"
-  conf_filename: "logstash_conf_template.yml"
+  config_filename: "logstash_conf_template.yml"
 
 wares_lan_logstash_service:
   filename: "logstash-wares.service"

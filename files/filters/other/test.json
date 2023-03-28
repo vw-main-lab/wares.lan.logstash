@@ -1,0 +1,56 @@
+{
+    "GENERAL": {
+      "Version": "1.0",
+      "Environment": "DEV"
+    },
+    "FILTERBLOCKS": [
+      {
+        "Name": "Specific application filters",
+        "Conditions": [
+          {
+            "Name": "APP001 code",
+            "String": "if \"APP001\" in [app_code]",
+            "Filters": [
+              {
+                "Name": "Grok filter for application 1",
+                "Type": "grok",
+                "Content": "match => { \"message\" => \"?<app_timestamp>%{GREEDYDATA} %{GREEDYDATA}) :: %{LOGLEVEL} :: %{IPV4} - - \\[%{GREEDYDATA}\\ %{TIME}\\]  %{WORD:http_method}%{GREEDYDATA:url_path} HTTP/%{NUMBER:http_version}  %{NUMBER:http_status_code} -\" }"
+              },
+              {
+                "Name": "Date filter",
+                "Type": "date",
+                "Content": "locale => \"en\"\nmatch => \"[\"app_timestamp\"], \"yyyy-MM-dd HH:mm:ss,SSS\"]\ntimezone => \"Europe/Paris\"\ntarget => \"timestamp\"\nadd_field => { \"hello\" => \"world\" }"
+              }
+            ]
+          },
+          {
+            "Name": "APP002 code",
+            "String": "if \"APP002\" in [app_code]",
+            "Filters": [
+              {
+                "Name": "Grok filters for application 2",
+                "Type": "grok",
+                "Content": "match => { \"message\" => [\n\t# Most specific\n\t\"%{DATE:my_log_date} %{TIME:my_log_TIME} :: %{LOGLEVEL} :: %{IPV4} - - \\[%{GREEDYDATA}\\ %{TIME}\\] %{WORD:http_method} %{GREEDYDATA:url_path} HTTP/%{NUMBER:http_version} %{NUMBER:http_status_code} -\",\n\t# Less specific\n\t\"%{TIMESTAMP_ISO8601:temp_date} -- {GREEDYDATA:log_message}\",\n\t# Raw:\n\t\"%{GREEDYDATA:log_message}\" ]"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "Name": "Other filters",
+        "Conditions": [
+          {
+            "Name": "Parse failures",
+            "String": "if \"_grokparsefailure\" in [tags] or \"_dateparsefailure\" in [tags]",
+            "Filters": [
+              {
+                "Name": "Drop parse failures",
+                "Type": "drop",
+                "Content": ""
+              }
+            ]
+          }
+        ]
+      }
+    ]
+}

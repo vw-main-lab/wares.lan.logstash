@@ -1,59 +1,137 @@
 ---
-- name: Download file with check
-  ansible.builtin.get_url:
-    url: "{{ wares_lan_logstash_source.download_url }}"
-    dest: "{{ wares_lan_logstash_source.temporary_dir }}"
-    checksum: "{{ wares_lan_logstash_source.checksum }}"
-  register: wares_lan_logstash_source_archive_file
+- name: Assert actions list is defined
+  ansible.builtin.assert:
+    that: wares_lan_logstash_actions is defined and (wares_lan_logstash_actions is not string and wares_lan_logstash_actions is not mapping and wares_lan_logstash_actions is iterable)
+    msg: "'wares_lan_logstash_actions' variable is not defined or is wrong type"
 
-- debug: var=wares_lan_logstash_source_archive_file
 
-- name: Ensure logstash user target group exists
-  ansible.builtin.group:
-    name: "{{ wares_lan_logstash.group }}"
-    state: present
+##########################################################
+################ INSTALL LOGSTASH BLOCK ##################
+##########################################################
 
-- name: Create logstash user if it does not exist
-  ansible.builtin.user:
-    name: "{{ wares_lan_logstash.user }}"
-    comment: "logstash User"
-    group: "{{ wares_lan_logstash.group }}"
-    shell: "{{ '/usr/sbin/nologin' if wares_lan_logstash.run_as_service is true else '/bin/bash' }}"
+- name: Install, Configure, Start Logstash
+  block:
 
-- name: Create directories if they do not exist
-  ansible.builtin.file:
-    path: "{{ item }}"
-    state: directory
-    owner: "{{ wares_lan_logstash.user }}"
-    group: "{{ wares_lan_logstash.group }}"
-    mode: '0755'
-  loop:
-    - "{{ wares_lan_logstash.binary_dir }}"
-    - "{{ wares_lan_logstash.config_dir }}"
 
-- name: Unarchive file that is already on the remote machine
-  ansible.builtin.unarchive:
-    src: "{{ wares_lan_logstash_source_archive_file.dest }}"
-    dest: "{{ wares_lan_logstash_source.temporary_dir }}"
-    remote_src: yes
+#     ################################
+#     # Download and check
+#     ################################
 
-- name: Copy extracted content to logstash binary dir
-  ansible.builtin.copy:
-    src: "{{ wares_lan_logstash_source.temporary_dir }}/{{ wares_lan_logstash_source.extracted_dirname }}/"
-    dest: "{{ wares_lan_logstash.binary_dir }}/"
-    owner: "{{ wares_lan_logstash.user }}"
-    group: "{{ wares_lan_logstash.group }}"
-    mode: '0755'
-    remote_src: yes
+#     - name: Download file with check
+#       ansible.builtin.get_url:
+#         url: "{{ wares_lan_logstash_source.download_url }}"
+#         dest: "{{ wares_lan_logstash_source.temporary_dir }}"
+#         checksum: "{{ wares_lan_logstash_source.checksum }}"
+#       register: wares_lan_logstash_source_archive_file
 
-- name: Template config file to logstash config directory
-  ansible.builtin.template:
-    src: "{{ wares_lan_logstash_source.conf_filename }}"
-    dest: "{{ wares_lan_logstash.config_dir }}/{{ wares_lan_logstash.config_filename }}"
-    owner: "{{ wares_lan_logstash.user }}"
-    group: "{{ wares_lan_logstash.group }}"
-    mode: '0755'
 
-- name: Set logstash service
-  ansible.builtin.include_tasks: "set_logstash_service.yml"
-  when: wares_lan_logstash.run_as_service == true
+#     ################################
+#     # Users and directories
+#     ################################
+
+#     - name: Ensure logstash user target group exists
+#       ansible.builtin.group:
+#         name: "{{ wares_lan_logstash.group }}"
+#         state: present
+
+#     - name: Create logstash user if it does not exist
+#       ansible.builtin.user:
+#         name: "{{ wares_lan_logstash.user }}"
+#         comment: "logstash User"
+#         group: "{{ wares_lan_logstash.group }}"
+#         shell: "{{ '/usr/sbin/nologin' if wares_lan_logstash.run_as_service is true else '/bin/bash' }}"
+
+#     - name: Create directories if they do not exist
+#       ansible.builtin.file:
+#         path: "{{ item }}"
+#         state: directory
+#         owner: "{{ wares_lan_logstash.user }}"
+#         group: "{{ wares_lan_logstash.group }}"
+#         mode: '0755'
+#       loop:
+#         - "{{ wares_lan_logstash.binary_dir }}"
+#         - "{{ wares_lan_logstash.config_dir }}"
+
+
+#     ################################
+#     # Extract to target directory
+#     ################################
+
+#     - name: Unarchive file that is already on the remote machine
+#       ansible.builtin.unarchive:
+#         src: "{{ wares_lan_logstash_source_archive_file.dest }}"
+#         dest: "{{ wares_lan_logstash_source.temporary_dir }}"
+#         remote_src: yes
+
+#     - name: Copy extracted content to logstash binary dir
+#       ansible.builtin.copy:
+#         src: "{{ wares_lan_logstash_source.temporary_dir }}/{{ wares_lan_logstash_source.extracted_dirname }}/"
+#         dest: "{{ wares_lan_logstash.binary_dir }}/"
+#         owner: "{{ wares_lan_logstash.user }}"
+#         group: "{{ wares_lan_logstash.group }}"
+#         mode: '0755'
+#         remote_src: yes
+
+
+#     ################################
+#     # Set config file and service
+#     ################################
+
+    - debug: msg="REMOVE ME"
+
+    # - name: Template config file to logstash config directory
+    #   ansible.builtin.template:
+    #     src: "{{ wares_lan_logstash_source.config_filename }}"
+    #     dest: "{{ wares_lan_logstash.config_dir }}/{{ wares_lan_logstash.config_filename }}"
+    #     owner: "{{ wares_lan_logstash.user }}"
+    #     group: "{{ wares_lan_logstash.group }}"
+    #     mode: '0755'
+
+    # - name: Set logstash service
+    #   ansible.builtin.include_tasks: "set_logstash_service.yml"
+    #   when: wares_lan_logstash.run_as_service == true
+
+
+#   always:
+
+#     ################################
+#     # Remove archive file
+#     ################################
+
+#     - name: Remove downloaded archive file if present
+#       ansible.builtin.file:
+#         path: "{{ wares_lan_logstash_source_archive_file.dest }}"
+#         state: absent
+
+
+  when: wares_lan_logstash_actions is defined and "install" in wares_lan_logstash_actions
+
+
+##########################################################
+################# UPDATE FILTERS BLOCK ###################
+##########################################################
+
+- name: Update Logstash filters
+  block:
+
+  - name: Hello
+    ansible.builtin.debug: msg="World"
+
+  # - name: Wipe out all filters from configuration file
+  #   ansible.builtin.replace:
+  #     path: "{{ wares_lan_logstash.config_dir }}/{{ wares_lan_logstash.config_filename }}"
+  #     regexp: |
+  #       (?i)filter(?-i)\s*\{[^}]*\}
+  #     replace: ''
+
+  - name: Wipe out all filters from configuration file
+    ansible.builtin.replace:
+      path: "{{ wares_lan_logstash.config_dir }}/{{ wares_lan_logstash.config_filename }}"
+      regexp: filter\s*\{[^}]*\}
+      replace: ''
+
+  - name: Remove blank lines from configuration file
+    ansible.builtin.replace:
+      path: "{{ wares_lan_logstash.config_dir }}/{{ wares_lan_logstash.config_filename }}"
+      regexp: '(^\s*$)'
+      replace: ''
