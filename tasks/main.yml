@@ -111,10 +111,29 @@
 ################# UPDATE FILTERS BLOCK ###################
 ##########################################################
 
-- name: Update Logstash filters
+- name: Update Logstash filter(s)
   block:
 
-  - name: Wipe out all filters from configuration file
+  - name: Assert filters settings json file path is defined
+    ansible.builtin.assert:
+      that: wares_lan_logstash_json_filepath is defined and wares_lan_logstash_json_filepath is string
+      msg: "'wares_lan_logstash_json_filepath' variable is not defined or is wrong type"
+  
+  - name: Get Logstash filters from Json
+    set_fact:
+      wares_lan_logstash_filters_settings: "{{ lookup('file',wares_lan_logstash_json_filepath) | from_json }}"
+
+  - debug: var=wares_lan_logstash_filters_settings.FILTERBLOCKS
+
+  - name: Assert FILTERBLOCKS section exists and is list
+    assert:
+      that: (wares_lan_logstash_filters_settings.FILTERBLOCKS is defined) and (wares_lan_logstash_filters_settings.FILTERBLOCKS is not string and wares_lan_logstash_filters_settings.FILTERBLOCKS is not mapping and wares_lan_logstash_filters_settings.FILTERBLOCKS is iterable)
+
+  - name: Get Logstash filters from Json
+    set_fact:
+      wares_lan_logstash_new_filters_content: "{{ lookup('template', './logstash_filters.j2') }}"
+
+  - name: Wipe out all filters from Logstash configuration file
     ansible.builtin.replace:
       path: "{{ wares_lan_logstash.config_dir }}/{{ wares_lan_logstash.config_filename }}"
       regexp: filter\s*\{[^}]*\}
@@ -125,3 +144,8 @@
       path: "{{ wares_lan_logstash.config_dir }}/{{ wares_lan_logstash.config_filename }}"
       regexp: '(^\s*$)'
       replace: ''
+
+  - name: Insert/Update filters block to configuration file
+    ansible.builtin.blockinfile:
+      path: "{{ wares_lan_logstash.config_dir }}/{{ wares_lan_logstash.config_filename }}"
+      block: "{{ wares_lan_logstash_new_filters_content }}"

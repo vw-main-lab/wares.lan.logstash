@@ -1,0 +1,5 @@
+{% for wares_lan_logstash_filterblocks in wares_lan_logstash_filters_settings.FILTERBLOCKS %}
+  filter {
+    {{ wares_lan_logstash_filterblocks.Name }}
+  }
+{% endfor %}
