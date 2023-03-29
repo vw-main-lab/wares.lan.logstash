@@ -145,7 +145,7 @@
       regexp: '(^\s*$)'
       replace: ''
 
-  - name: Insert/Update filters block to configuration file
+  - name: Insert filters block to configuration file
     ansible.builtin.blockinfile:
       path: "{{ wares_lan_logstash.config_dir }}/{{ wares_lan_logstash.config_filename }}"
       block: "{{ wares_lan_logstash_new_filters_content }}"
