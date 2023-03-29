@@ -1,5 +1,13 @@
 {% for wares_lan_logstash_filterblocks in wares_lan_logstash_filters_settings.FILTERBLOCKS %}
   filter {
-    {{ wares_lan_logstash_filterblocks.Name }}
+    {% for wares_lan_logstash_blockconditions in wares_lan_logstash_filterblocks.Conditions %}
+    {{ wares_lan_logstash_blockconditions.String }} {
+      {% for wares_lan_logstash_filter in wares_lan_logstash_blockconditions.Filters %}
+      {{ wares_lan_logstash_filter.Type }} {
+        {{ wares_lan_logstash_filter.Content }}
+      }
+      {% endfor %}
+    }
+    {% endfor %}
   }
 {% endfor %}
