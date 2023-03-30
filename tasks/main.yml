@@ -77,8 +77,6 @@
     # Set config file and service
     ################################
 
-    - debug: msg="REMOVE ME"
-
     - name: Template config file to logstash config directory
       ansible.builtin.template:
         src: "{{ wares_lan_logstash_source.config_filename }}"
@@ -100,9 +98,9 @@
 
     - name: Remove downloaded archive file if present
       ansible.builtin.file:
-        path: "{{ wares_lan_logstash_source_archive_file.dest }}"
+        path: "{{ wares_lan_logstash_source.temporary_dir }}/{{ (wares_lan_logstash_source.download_url).split('/')|last }}"
         state: absent
-
+        
 
   when: wares_lan_logstash_actions is defined and "install" in wares_lan_logstash_actions
 
