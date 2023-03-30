@@ -114,6 +114,11 @@
 - name: Update Logstash filter(s)
   block:
 
+
+    ################################
+    # Assert
+    ################################
+
   - name: Assert filters settings json file path is defined
     ansible.builtin.assert:
       that: wares_lan_logstash_json_filepath is defined and wares_lan_logstash_json_filepath is string
@@ -129,7 +134,12 @@
     assert:
       that: (wares_lan_logstash_filters_settings.FILTERBLOCKS is defined) and (wares_lan_logstash_filters_settings.FILTERBLOCKS is not string and wares_lan_logstash_filters_settings.FILTERBLOCKS is not mapping and wares_lan_logstash_filters_settings.FILTERBLOCKS is iterable)
 
-  - name: Get Logstash filters from Json
+
+    ################################
+    # Generate, Remove
+    ################################
+
+  - name: Generate new content for configuration file
     set_fact:
       wares_lan_logstash_new_filters_content: "{{ lookup('template', './logstash_filters.j2') }}"
 
@@ -145,7 +155,15 @@
       regexp: '(^\s*$)'
       replace: ''
 
+
+    ################################
+    # Insert
+    ################################
+
   - name: Insert filters block to configuration file
     ansible.builtin.blockinfile:
       path: "{{ wares_lan_logstash.config_dir }}/{{ wares_lan_logstash.config_filename }}"
       block: "{{ wares_lan_logstash_new_filters_content }}"
+
+
+  when: wares_lan_logstash_actions is defined and "update" in wares_lan_logstash_actions
