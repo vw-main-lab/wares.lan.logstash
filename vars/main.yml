@@ -19,6 +19,7 @@ wares_lan_logstash:
         - {id: 'dev', url: 'http://localhost', enabled: true, port: 9201}
         - {id: 'prod', url: 'http://es.domain.com', enabled: false, port: 9202}
       index: "%{[@metadata][beat]}-%{[@metadata][version]}-%{+YYYY.MM.dd}"
+      ilm_enabled: False # leave false if you don't know what you are doing
       ssl_enabled: False # either True ou False
       ssl_certificate_verification: False # either True ou False
       cacert: "/usr/share/ca-certificates/my.pem" # path to certificate; leave blank ("") to disable
